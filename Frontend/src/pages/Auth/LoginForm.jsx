@@ -121,7 +121,7 @@ const LoginForm = () => {
               control={<Checkbox color="primary" />}
               label="Remember for 30 days"
             />
-            <Typography variant="body2" color="primary" sx={{ cursor: 'pointer' }}>
+            <Typography component={Link} to="/verify" variant="body2" color="primary" sx={{ cursor: 'pointer' }}>
                 Forgot password?
             </Typography>
           </Box>

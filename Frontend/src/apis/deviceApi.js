@@ -38,7 +38,7 @@ export const fetchDevices = async (pageNum) => {
     }
   };
 
-  export const sendDataToDevice = async (deviceId, status, value, userId) => {
+export const sendDataToDevice = async (deviceId, status, value, userId) => {
     try {
         const token = localStorage.getItem('token')
         const response = await axios.post(`${BASE_URL}/devices/sendData`, {
@@ -55,5 +55,24 @@ export const fetchDevices = async (pageNum) => {
         return response.data
     } catch (error) {
         console.error('Error sending data to device:', error.response ? error.response.data : error.message)
+    }
+}
+
+export const getSensorRecords = async(deviceId, pageOffset = 1, limit = 10) => {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${BASE_URL}/devices/sensor-records/${deviceId}`, {  
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            params: {
+                pageOffset,
+                limit
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching sensor records:', error);
     }
 }

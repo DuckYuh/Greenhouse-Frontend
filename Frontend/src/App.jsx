@@ -6,6 +6,7 @@ import Auth from './pages/Auth/Auth.jsx'
 import HomePage from './pages/HomePage/HomePage.jsx'
 import DataPage from './pages/Data/DataPage.jsx'
 import DevicePage from './pages/Device/DevicePage.jsx'
+import HistoryPage from './pages/History/HistoryPage.jsx'
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from './redux/Slices/userSlice.js'
 
@@ -28,10 +29,13 @@ function App() {
           </Route>
             <Route path='/data' element={<DataPage/>}/>
             <Route path='/device' element={<DevicePage/>}/>
+            <Route path='/history' element={<HistoryPage/>}/>
           {/* <Route path='/data' element={<DataPage/>}/> */}
           <Route path='/' element={<HomePage/>}/>
           <Route path='/Signup' element={<Auth/>}/>
           <Route path='/Login' element={<Auth/>}/>
+          <Route path='/newpass' element={<Auth/>}/>
+          <Route path='/verify' element={<Auth/>}/>
         </Routes>
       </div>
     </div>
