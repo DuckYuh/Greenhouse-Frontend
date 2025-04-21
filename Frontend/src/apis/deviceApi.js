@@ -22,7 +22,7 @@ export const subscribeGreenhouseData = (greenhouseId, onMessage, onError) => {
 export const fetchDevices = async (pageNum) => {
     try {
         const token = localStorage.getItem('token')
-        const response = await axios.get(`${BASE_URL}/devices/getControllers`, {
+        const response = await axios.get(`${BASE_URL}/devices/controllers`, {
             headers: {
                 Authorization: `Bearer ${token}`
             },
@@ -41,7 +41,7 @@ export const fetchDevices = async (pageNum) => {
 export const sendDataToDevice = async (deviceId, status, value, userId) => {
     try {
         const token = localStorage.getItem('token')
-        const response = await axios.post(`${BASE_URL}/devices/sendData`, {
+        const response = await axios.post(`${BASE_URL}/devices/data`, {
             deviceId,
             status,
             value,
@@ -76,3 +76,35 @@ export const getSensorRecords = async(deviceId, pageOffset = 1, limit = 10) => {
         console.error('Error fetching sensor records:', error);
     }
 }
+
+export const addController = async (controllerDto) => {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await axios.post(`${BASE_URL}/devices/controllerss`, controllerDto, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error adding controller:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
+
+export const addSensor = async (sensorDto) => {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await axios.post(`${BASE_URL}/devices/sensors`, sensorDto, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error adding sensor:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
