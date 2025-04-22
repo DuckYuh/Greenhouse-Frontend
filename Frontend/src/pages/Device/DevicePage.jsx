@@ -18,6 +18,13 @@ import {
   CssBaseline,
   Divider,
   Breadcrumbs,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  MenuItem,
+  Select,
+  TextField,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -27,6 +34,8 @@ import Sidebar from '../../components/SideBar';
 import {fetchDevices} from '../../apis/deviceApi';
 import {sendDataToDevice} from '../../apis/deviceApi';
 import {jwtDecode} from 'jwt-decode';
+import { addController } from '../../apis/deviceApi';
+import { addSensor } from '../../apis/deviceApi';
 
 const DeviceTable = () => {
   // Sample data for the table
@@ -35,6 +44,60 @@ const DeviceTable = () => {
   // State for pagination
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState()
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const [deviceType, setDeviceType] = useState('Controller');
+  const [formData, setFormData] = useState({
+    topic: '',
+    deviceType: '',
+    controllerType: '',
+    sensorType: '',
+    value: 0,
+    maxValue: 100,
+    status: 0,
+  });
+
+  const handleOpenDialog = () => setOpenDialog(true);
+  const handleCloseDialog = () => setOpenDialog(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const decoded = jwtDecode(token);
+      const userId = decoded.sub;
+  
+      const commonData = {
+        topic: formData.topic,
+        deviceType: formData.deviceType,
+        greenHouseId: 1, // Tùy theo logic app bạn
+        userId: userId,
+      };
+  
+      if (deviceType === 'Controller') {
+        await addController({
+          ...commonData,
+          controllerType: formData.controllerType,
+          value: Number(formData.value),
+          status: Number(formData.status),
+        });
+      } else {
+        await addSensor({
+          ...commonData,
+          sensorType: formData.sensorType,
+          maxValue: Number(formData.maxValue),
+        });
+      }
+  
+      handleCloseDialog();
+      setPage(1); // Refresh lại trang đầu
+    } catch (error) {
+      console.error("Failed to add device", error);
+    }
+  };
 
   useEffect(() => {
     const getDevices = async   () => {
@@ -115,9 +178,9 @@ const DeviceTable = () => {
             <Box sx={{ p: 2 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Button variant="contained" color="primary">
-                    New Device
-                  </Button>
+                <Button variant="contained" color="primary" onClick={handleOpenDialog}>
+                  New Device
+                </Button>
                 </Box>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                   <Paper
@@ -197,9 +260,62 @@ const DeviceTable = () => {
               </Box>
             </Box>
         </Box>
+        
+        <Dialog open={openDialog} onClose={handleCloseDialog}>
+          <DialogTitle>Add New Device</DialogTitle>
+          <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+            <Select value={deviceType} 
+            onChange={(e) => { 
+              const selectedType = e.target.value;
+              setDeviceType(e.target.value);
+              setFormData((prevData) => ({
+                ...prevData,
+                deviceType: selectedType === 'Controller' ? 'controller' : 'sensor',
+              }));
+              }}
+            >
+              <MenuItem value="Controller">Controller</MenuItem>
+              <MenuItem value="Sensor">Sensor</MenuItem>
+            </Select>
+
+            <TextField name="deviceType" label="Device Type" value={formData.deviceType} onChange={handleChange} disabled/>
+            <TextField name="topic" label="Topic" value={formData.topic} onChange={handleChange} />
+
+            {deviceType === 'Controller' && (
+              <>
+                <TextField name="controllerType" label="Controller Type" value={formData.controllerType} onChange={handleChange} />
+                <TextField name="value" label="Value" type="number" value={formData.value} onChange={handleChange} />
+                <TextField name="status" label="Status (0/1)" type="number" value={formData.status} onChange={handleChange} />
+              </>
+            )}
+
+            {deviceType === 'Sensor' && (
+              <>
+                <Select
+                  name="sensorType"
+                  value={formData.sensorType}
+                  onChange={handleChange}
+                  displayEmpty
+                >
+                  <MenuItem value="" disabled>Select Sensor Type</MenuItem>
+                  <MenuItem value="humidity">Humidity</MenuItem>
+                  <MenuItem value="light">Light</MenuItem>
+                  <MenuItem value="earth">Earth</MenuItem>
+                  <MenuItem value="temperature">Temperature</MenuItem>
+                </Select>
+                <TextField name="maxValue" label="Max Value" type="number" value={formData.maxValue} onChange={handleChange} />
+              </>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>Cancel</Button>
+            <Button onClick={handleSubmit} variant="contained">Submit</Button>
+          </DialogActions>
+        </Dialog>
 
     </Box>
   );
 };
+
 
 export default DeviceTable;
