@@ -30,7 +30,7 @@ export const subscribeGreenhouseData = (greenhouseId, onMessage, onError) => {
 }
 
 // Fetch devices from API
-export const fetchDevices = async (pageNum) => {
+export const fetchDevices = async (pageNum, greenhouseId = 1) => {
     try {
         const token = Cookies.get('token')
         const response = await axios.get(`${BASE_URL}/devices/controllers`, {
@@ -38,7 +38,7 @@ export const fetchDevices = async (pageNum) => {
                 Authorization: `Bearer ${token}`
             },
             params: {
-            greenhouseId: 1,
+            greenhouseId,
             limit: 5,
             pageOffset: pageNum
             }
@@ -48,6 +48,25 @@ export const fetchDevices = async (pageNum) => {
       console.error('Error fetching devices:', error)
     }
   };
+
+export const fetchSensors = async (pageNum, greenhouseId = 1) => {
+  try {
+    const token = localStorage.getItem('token')
+    const response = await axios.get(`${BASE_URL}/devices/sensors`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      params: {
+        greenhouseId,  // Bạn có thể truyền tham số tùy theo yêu cầu
+        limit: 5,
+        pageOffset: pageNum
+      }
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error fetching sensors:', error)
+  }
+}
 
 export const sendDataToDevice = async (deviceId, status, value, userId) => {
     try {
@@ -91,7 +110,7 @@ export const getSensorRecords = async(deviceId, pageOffset = 1, limit = 10) => {
 export const addController = async (controllerDto) => {
     try {
         const token = localStorage.getItem('token');
-        const response = await axios.post(`${BASE_URL}/devices/controllerss`, controllerDto, {
+        const response = await axios.post(`${BASE_URL}/devices/controllers`, controllerDto,{
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -107,7 +126,7 @@ export const addController = async (controllerDto) => {
 export const addSensor = async (sensorDto) => {
     try {
         const token = localStorage.getItem('token');
-        const response = await axios.post(`${BASE_URL}/devices/sensors`, sensorDto, {
+        const response = await axios.post(`${BASE_URL}/devices/sensors`, sensorDto,{
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json'
