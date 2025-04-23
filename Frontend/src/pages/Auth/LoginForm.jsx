@@ -12,6 +12,8 @@ import { login } from '../../apis/auth';
 import { useNavigate } from 'react-router-dom';
 import { loginUserAPI } from '../../redux/Slices/userSlice.js'
 import { useDispatch } from 'react-redux';
+import Cookies from 'js-cookie'
+import { toast } from 'react-toastify'
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -30,18 +32,30 @@ const LoginForm = () => {
       setLoading(false);
       return;
     }
-    try {
-      // const data = dispatch(loginUserAPI(loginUserAPI({email, password})));
-      const data = await login(email, password);
-      localStorage.setItem('token', data.access_token);
+
+    // const data = dispatch(loginUserAPI(loginUserAPI({email, password})));
+    await toast.promise(login(email, password), {
+      pending: 'Logging in...'
+    }).then((res) => {
+      // localStorage.setItem('token', data.access_token);
+      Cookies.set('token', res.access_token, {
+        expires: 7,
+        // secure: true,
+        sameSite: 'Lax'
+      });
+      Cookies.set('refreshToken', res.refresh_token, {
+        expires: 7,
+        // secure: true,
+        sameSite: 'Lax'
+      });
 
       navigate('/');
-    } catch (err) {
+    }).catch((err) => {
       setError(err.message);
-    } finally {
+    }) .finally(() => {
       setLoading(false);
-    }
-  };
+    })
+  }
   const [open, setOpen] = useState(false);
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {

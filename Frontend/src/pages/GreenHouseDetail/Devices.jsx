@@ -1,4 +1,3 @@
-/* eslint-disable indent */
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box,
@@ -32,93 +31,78 @@ import {sendDataToDevice} from '../../apis/deviceApi';
 import {jwtDecode} from 'jwt-decode';
 import Cookies from 'js-cookie';
 
-
-const DeviceTable = () => {
-  // Sample data for the table
+const Devices = () => {
   const [devices, setDevices] = useState([])
-
-  // State for pagination
-  const [page, setPage] = useState(1)
-  const [totalPages, setTotalPages] = useState()
-  const sliderRef = useRef();
-
-  useEffect(() => {
-    const getDevices = async () => {
+  
+    // State for pagination
+    const [page, setPage] = useState(1)
+    const [totalPages, setTotalPages] = useState()
+    const sliderRef = useRef();
+  
+    useEffect(() => {
+      const getDevices = async () => {
+        try {
+          const response = await fetchDevices(page)
+          setDevices(response.data)
+          setTotalPages(response.totalPages)
+          console.log('Devices:', devices)
+        } catch (error) {
+          console.error('Error fetching devices:', error)
+        }
+      };
+      getDevices()
+    }, [page])
+  
+    // Handle checkbox toggle
+    const sendDataToDeviceAsync = useCallback(async (cid, status, value, userId) => {
       try {
-        const response = await fetchDevices(page)
-        setDevices(response.data)
-        setTotalPages(response.totalPages)
-        console.log('Devices:', devices)
+        await sendDataToDevice(cid, status, value, userId)
       } catch (error) {
-        console.error('Error fetching devices:', error)
+        console.error('Không thể cập nhật thiết bị:', error)
+        // Rollback về trạng thái ngược lại nếu API thất bại
+        setDevices((prevDevices) =>
+          prevDevices.map((device) =>
+            device.CID === cid ? { ...device, status: status === 1 ? 0 : 1 } : device
+          )
+        )
       }
-    };
-    getDevices()
-  }, [page])
-
-  // Handle checkbox toggle
-  const sendDataToDeviceAsync = useCallback(async (cid, status, value, userId) => {
-    try {
-      await sendDataToDevice(cid, status, value, userId)
-    } catch (error) {
-      console.error('Không thể cập nhật thiết bị:', error)
-      // Rollback về trạng thái ngược lại nếu API thất bại
+    }, [])
+  
+    const handleCheckboxChange = useCallback((cid, currentStatus) => {
+      const newStatus = currentStatus > 0 ? 1 : 0
+      const newValue = currentStatus
+  
+      // Kiểm tra trạng thái trước và sau khi cập nhật
+      console.log(`Trước: CID=${cid}, status=${currentStatus}, sẽ thành ${newStatus}`)
+  
+      // Cập nhật trạng thái ngay lập tức
       setDevices((prevDevices) =>
         prevDevices.map((device) =>
-          device.CID === cid ? { ...device, status: status === 1 ? 0 : 1 } : device
+          device.CID === cid ? { ...device, status: newStatus, value: newValue } : device
         )
       )
+  
+      // Gửi API ở background
+      const token = Cookies.get('token')
+      const decodedToken = jwtDecode(token)
+      const userId = decodedToken.sub
+  
+      if (!userId) {
+        console.error('Thiếu ID người dùng!')
+        return
+      }
+  
+      sendDataToDeviceAsync(cid, newStatus, newValue, userId)
+    }, [sendDataToDeviceAsync])
+  
+  
+    // Handle page change
+    const handlePageChange = (event, value) => {
+      setPage(value)
     }
-  }, [])
-
-  const handleCheckboxChange = useCallback((cid, currentStatus) => {
-    const newStatus = currentStatus > 0 ? 1 : 0
-    const newValue = currentStatus
-
-    // Kiểm tra trạng thái trước và sau khi cập nhật
-    console.log(`Trước: CID=${cid}, status=${currentStatus}, sẽ thành ${newStatus}`)
-
-    // Cập nhật trạng thái ngay lập tức
-    setDevices((prevDevices) =>
-      prevDevices.map((device) =>
-        device.CID === cid ? { ...device, status: newStatus, value: newValue } : device
-      )
-    )
-
-    // Gửi API ở background
-    const token = Cookies.get('token')
-    const decodedToken = jwtDecode(token)
-    const userId = decodedToken.sub
-
-    if (!userId) {
-      console.error('Thiếu ID người dùng!')
-      return
-    }
-
-    sendDataToDeviceAsync(cid, newStatus, newValue, userId)
-  }, [sendDataToDeviceAsync])
-
-
-  // Handle page change
-  const handlePageChange = (event, value) => {
-    setPage(value)
-  }
 
   return (
-    <Box sx={{ display: 'flex' }}>
-        <CssBaseline />
-        <Sidebar />
-        <Box
-                component="main"
-                sx={{ flexGrow: 1, backgroundColor: '#f4f4f4', minHeight: '100vh', p: 3 }}
-              >
-            <Typography variant='h4' sx={{ mb: 2 }}>Devices</Typography>
-            <Breadcrumbs sx={{}} aria-label="breadcrumb">
-                <Typography color="inherit" sx={{ borderBottom:3 }}>Devices</Typography>
-            </Breadcrumbs>
-
-            <Divider sx={{ mb: 3 }} color='#DDE1E6' ></Divider>
-            <Box sx={{ p: 2 }}>
+    <Box sx={{ p: 2 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                   <Button variant="contained" color="primary">
@@ -209,10 +193,7 @@ const DeviceTable = () => {
                 />
               </Box>
             </Box>
-        </Box>
+  )
+}
 
-    </Box>
-  );
-};
-
-export default DeviceTable;
+export default Devices

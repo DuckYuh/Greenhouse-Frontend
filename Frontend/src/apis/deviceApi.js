@@ -1,8 +1,19 @@
 import axios from 'axios'
 import { BASE_URL } from '../util/constant'
+import Cookies from 'js-cookie'
+import {EventSourcePolyfill} from 'event-source-polyfill'
+import { authorizedAxios } from '../util/axiosAuthen'
 
 export const subscribeGreenhouseData = (greenhouseId, onMessage, onError) => {
-    const eventSource = new EventSource(`${BASE_URL}/sse/data?greenhouse=${greenhouseId}`)
+    const token = Cookies.get('token')
+    const eventSource = new EventSourcePolyfill(`${BASE_URL}/sse/data?greenhouse=${greenhouseId}`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+    )
 
     eventSource.onmessage = (event) => {
         const parsedData = JSON.parse(event.data)
@@ -21,7 +32,7 @@ export const subscribeGreenhouseData = (greenhouseId, onMessage, onError) => {
 // Fetch devices from API
 export const fetchDevices = async (pageNum) => {
     try {
-        const token = localStorage.getItem('token')
+        const token = Cookies.get('token')
         const response = await axios.get(`${BASE_URL}/devices/controllers`, {
             headers: {
                 Authorization: `Bearer ${token}`
@@ -40,7 +51,7 @@ export const fetchDevices = async (pageNum) => {
 
 export const sendDataToDevice = async (deviceId, status, value, userId) => {
     try {
-        const token = localStorage.getItem('token')
+        const token = Cookies.get('token')
         const response = await axios.post(`${BASE_URL}/devices/data`, {
             deviceId,
             status,
@@ -60,7 +71,7 @@ export const sendDataToDevice = async (deviceId, status, value, userId) => {
 
 export const getSensorRecords = async(deviceId, pageOffset = 1, limit = 10) => {
     try {
-        const token = localStorage.getItem('token');
+        const token = Cookies.get('token')
         const response = await axios.get(`${BASE_URL}/devices/sensor-records/${deviceId}`, {  
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -108,3 +119,53 @@ export const addSensor = async (sensorDto) => {
         throw error;
     }
 };
+
+export const getListGreenHouseAPI = async (page, limit) => {
+    const response = await authorizedAxios.get(`/greenhouse/details?pageOffset=${page}&limit=${limit}`)
+    return response.data
+  }
+  
+  export const deleteGreenHouseAPI = async (id) => {
+    const response = await authorizedAxios.delete(`/greenhouse/${id}`)
+    return response.data
+  }
+  
+  export const updateGreenHouseAPI = async (id, data) => {
+    const response = await authorizedAxios.patch(`/greenhouse/${id}`, data)
+    return response.data
+  }
+  
+  export const addGreenHouseAPI = async (data) => {
+    const response = await authorizedAxios.post('/greenhouse', data)
+    return response.data
+  }
+    
+export const getListSensorAPI = async (greenhouseId, page, limit = 10) => {
+    const response = await authorizedAxios.get(`/devices/sensors?greenhouseId=${greenhouseId}&pageOffset=${page}&limit=${limit}`)
+    return response.data
+    }
+
+export const getListSchedulesAPI = async (greenhouseId, page, limit = 10) => {
+    const response = await authorizedAxios.get(`/scheduler/${greenhouseId}?pageOffset=${page}&limit=${limit}`)
+    return response.data
+    }
+    
+    export const addScheduleAPI = async (data) => {
+    const response = await authorizedAxios.post('/scheduler', data)
+    return response.data
+    }
+    
+    export const deleteScheduleAPI = async (id) => {
+    const response = await authorizedAxios.delete(`/scheduler/${id}`)
+    return response.data
+    }
+    
+    export const updateScheduleAPI = async (id, data) => {
+    const response = await authorizedAxios.patch(`/scheduler/${id}`, data)
+    return response.data
+    }
+    
+    export const getDetailScheduleAPI = async (id) => {
+    const response = await authorizedAxios.get(`/scheduler/controller/${id}`)
+    return response.data
+    }
