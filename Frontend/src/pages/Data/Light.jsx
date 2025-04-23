@@ -60,7 +60,7 @@ const LightProgressBar = ({ total = 420, achieved = 1000 }) => {
 
       {/* Total Value (420) */}
       <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
-        {achieved}
+        {achieved} lux
       </Typography>
 
       {/* Custom Progress Bar */}

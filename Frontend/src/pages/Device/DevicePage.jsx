@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+/* eslint-disable indent */
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box,
   Button,
@@ -18,6 +19,8 @@ import {
   CssBaseline,
   Divider,
   Breadcrumbs,
+  Switch,
+  Slider,
   Dialog,
   DialogActions,
   DialogContent,
@@ -34,6 +37,7 @@ import Sidebar from '../../components/SideBar';
 import {fetchDevices} from '../../apis/deviceApi';
 import {sendDataToDevice} from '../../apis/deviceApi';
 import {jwtDecode} from 'jwt-decode';
+import Cookies from 'js-cookie';
 import { addController } from '../../apis/deviceApi';
 import { addSensor } from '../../apis/deviceApi';
 
@@ -44,6 +48,7 @@ const DeviceTable = () => {
   // State for pagination
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState()
+  const sliderRef = useRef();
 
   const [openDialog, setOpenDialog] = useState(false);
   const [deviceType, setDeviceType] = useState('Controller');
@@ -100,12 +105,12 @@ const DeviceTable = () => {
   };
 
   useEffect(() => {
-    const getDevices = async   () => {
+    const getDevices = async () => {
       try {
         const response = await fetchDevices(page)
         setDevices(response.data)
+        setTotalPages(response.totalPages)
         console.log('Devices:', devices)
-        setTotalPages(response.pagination.totalPages)
       } catch (error) {
         console.error('Error fetching devices:', error)
       }
@@ -129,8 +134,8 @@ const DeviceTable = () => {
   }, [])
 
   const handleCheckboxChange = useCallback((cid, currentStatus) => {
-    const newStatus = currentStatus === 1 ? 0 : 1
-    const newValue = currentStatus === 1 ? 0 : 28
+    const newStatus = currentStatus > 0 ? 1 : 0
+    const newValue = currentStatus
 
     // Kiểm tra trạng thái trước và sau khi cập nhật
     console.log(`Trước: CID=${cid}, status=${currentStatus}, sẽ thành ${newStatus}`)
@@ -138,12 +143,12 @@ const DeviceTable = () => {
     // Cập nhật trạng thái ngay lập tức
     setDevices((prevDevices) =>
       prevDevices.map((device) =>
-        device.CID === cid ? { ...device, status: newStatus } : device
+        device.CID === cid ? { ...device, status: newStatus, value: newValue } : device
       )
     )
 
     // Gửi API ở background
-    const token = localStorage.getItem('token')
+    const token = Cookies.get('token')
     const decodedToken = jwtDecode(token)
     const userId = decodedToken.sub
 
@@ -220,20 +225,27 @@ const DeviceTable = () => {
                     {devices.map((device) => (
                       <TableRow key={device.CID}>
                         <TableCell>
-                          <Checkbox
-                            checked={device.status === 1}
-                            onChange={() => handleCheckboxChange(device.CID, device.status)}
+                          <Slider
+                            ref={sliderRef}
+                            value={device.value}
+                            step={1}
+                            min={0}
+                            max={100}
+                            onChange={(_, newValue) => handleCheckboxChange(device.CID, newValue)}
+                            onChangeCommitted={() => {
+                              sliderRef.current?.blur(); // Bỏ focus
+                            }}
                           />
                         </TableCell>
-                        <TableCell>{device.topic}</TableCell>
-                        <TableCell>{device.controllerType}</TableCell>
-                        <TableCell align="right">
-                          <Button variant="outlined" size="small" sx={{ mr: 1 }}>
-                            Change
-                          </Button>
-                          <IconButton>
-                            <ClearIcon />
-                          </IconButton>
+                          <TableCell>{device.topic}</TableCell>
+                          <TableCell>{device.controllerType}</TableCell>
+                          <TableCell align="right">
+                            <Button variant="outlined" size="small" sx={{ mr: 1 }}>
+                              Change
+                            </Button>
+                            <IconButton>
+                              <ClearIcon />
+                            </IconButton>
                         </TableCell>
                       </TableRow>
                     ))}
