@@ -16,6 +16,7 @@ const HistoryTable = () => {
   const [deviceId, setdeviceId] = useState(1);
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState()
+  const [filterDate, setFilterDate] = useState('');
   
   useEffect(() => {
     const getSensorIdByType = async () => {
@@ -54,6 +55,20 @@ const HistoryTable = () => {
   const handlePageChange = (event, value) => {
     setPage(value)
   }
+
+  const filteredSensorDatas = sensorDatas.filter((sensorData) => {
+    if (!filterDate) return true;
+    const date = new Date(sensorData.dateCreated).toISOString().split('T')[0];
+    return date === filterDate;
+  });
+
+  const effectiveTotalPages = filterDate
+    ? Math.ceil(filteredSensorDatas.length / 10)
+    : totalPages;
+
+  const paginatedSensorDatas = filterDate
+    ? filteredSensorDatas.slice((page - 1) * 10, page * 10)
+    : filteredSensorDatas;
   
 
   return (
@@ -75,6 +90,10 @@ const HistoryTable = () => {
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mb: 2 }}>
             <Paper
               component="form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                setPage(1); // reset về page 1 khi filter
+              }}
               sx={{
                 display: 'flex',
                 alignItems: 'center',
@@ -82,9 +101,14 @@ const HistoryTable = () => {
                 border: '1px solid #ccc'
               }}
               >
-              <InputBase sx={{ ml: 1, flex: 1 }} placeholder="yyyy-mm-dd" />
+              <InputBase
+                sx={{ ml: 1, flex: 1 }}
+                placeholder="Date: yyyy-mm-dd"
+                value={filterDate}
+                onChange={(e) => setFilterDate(e.target.value)}
+              />
               <IconButton type="submit" sx={{ p: '10px' }}>
-              <SearchIcon />
+                <SearchIcon />
               </IconButton>
             </Paper>
           </Box>
@@ -97,24 +121,34 @@ const HistoryTable = () => {
                     <Typography variant="subtitle2">Date</Typography>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="subtitle2">Data</Typography>
+                    <Typography variant="subtitle2">Time</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="subtitle2">Value</Typography>
                   </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {sensorDatas.map((sensorData) => (
-                  <TableRow key={sensorData.CID}>
-                    <TableCell>{sensorData.dateCreated}</TableCell>
-                    <TableCell>{sensorData.value}</TableCell>
-                  </TableRow>
-                ))}
+                {paginatedSensorDatas.map((sensorData) => {
+                  const date = new Date(sensorData.dateCreated);
+                  const formattedDate = date.toISOString().split('T')[0]; // yyyy-mm-dd
+                  const formattedTime = date.toTimeString().split(' ')[0]; // hh:mm:ss
+
+                  return (
+                    <TableRow key={sensorData.CID}>
+                      <TableCell>{formattedDate}</TableCell>
+                      <TableCell>{formattedTime}</TableCell>
+                      <TableCell>{sensorData.value}</TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>
 
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
             <Pagination
-              count={totalPages}
+              count={effectiveTotalPages}
               page={page}
               onChange={handlePageChange}
               renderItem={(item) => (
