@@ -41,12 +41,13 @@ const Schedule = () => {
     timeStart: '',
     duration: '',
     value: '',
-    SchedulerOptions: 'NOT_REPEAT',
+    options: 'NOT_REPEAT',
     deviceId: []
   })
 
 
   const fetchSchedules = async () => {
+    console.log(id)
     toast.promise(getListSchedulesAPI(id, page), {
       pending: 'Đang tải lịch'
     })
@@ -77,6 +78,7 @@ const Schedule = () => {
   const handleClose = () => setOpenDialog(false)
 
   const handleSubmit = async () => {
+    console.log('Form data:', form)
     if (editingSchedule) {
       toast.promise(updateScheduleAPI(editingSchedule.SID, form), {
         pending: 'Đang cập nhật lịch',
@@ -203,7 +205,7 @@ const Schedule = () => {
             fullWidth
             margin="normal"
             value={form.SchedulerOptions}
-            onChange={(e) => setForm({ ...form, SchedulerOptions: e.target.value })}
+            onChange={(e) => setForm({ ...form, options: e.target.value })}
           >
             {recurrenceOptions.map((option) => (
               <MenuItem key={option.value} value={option.value}>

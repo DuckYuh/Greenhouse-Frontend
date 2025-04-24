@@ -41,13 +41,14 @@ const Data = () => {
     const eventSource = subscribeGreenhouseData(
       greenhouseId,
       (newData) => {
+        console.log('Received data:', newData)
+        
         if (Array.isArray(newData)) {
           handleSensorData(newData)
         }
       },
       (err) => setError('Không thể kết nối SSE')
     )
-
     return () => {
       eventSource.close()
     }

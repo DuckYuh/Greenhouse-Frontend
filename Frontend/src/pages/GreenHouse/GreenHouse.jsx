@@ -30,13 +30,12 @@ const GreenHouse = () => {
   }
 
   const handleAddGreenHouse = async () => {
-    if (!formData.id || !formData.name || !formData.location) {
+    if (!formData.name || !formData.location) {
       toast.error('Vui lòng điền đầy đủ thông tin!')
       return
     }
     // Có thể gọi API tại đây nếu cần
     const newGreenHouse = {
-      GID: formData.id,
       name: formData.name,
       location: formData.location
     }
@@ -168,13 +167,6 @@ const GreenHouse = () => {
         <Dialog open={openAdd} onClose={handleCloseAdd} fullWidth>
           <DialogTitle>Thêm Nhà Kính</DialogTitle>
           <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-            <TextField
-              label="ID"
-              name="id"
-              value={formData.id}
-              onChange={handleInputChange}
-              fullWidth
-            />
             <TextField
               label="Tên Nhà Kính"
               name="name"

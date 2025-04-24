@@ -8,7 +8,7 @@ export const fetchUnreadNotifications = (userId, onMessage, onError) => {
   // const response = await authorizedAxios.get(`/sse/notification?userId=${userId}&limit=${limit}`)
   // console.log('Fetched notifications:', response)
   // return response.data.filter(notification => !notification.isRead)
-    const limit = 10
+    const limit = 100
     const token = Cookies.get('token')
     const eventSource = new EventSourcePolyfill(`${BASE_URL}/sse/notification?userId=${userId}&limit=${limit}`,
         {
@@ -21,7 +21,7 @@ export const fetchUnreadNotifications = (userId, onMessage, onError) => {
 
     eventSource.onmessage = (event) => {
         const parsedData = JSON.parse(event.data)
-        onMessage(parsedData) // Gọi callback để cập nhật dữ liệu
+        onMessage(parsedData)
     }
 
     eventSource.onerror = (error) => {

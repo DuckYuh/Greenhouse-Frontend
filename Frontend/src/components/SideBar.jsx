@@ -47,11 +47,20 @@ const Sidebar = () => {
   const isAuthenticated = !!isLoggedIn()
 
   const loadNotifications = async () => {
-    await toast.promise(fetchUnreadNotifications(1))
-      .then((res) => {
+      const eventSource = fetchUnreadNotifications(
+      1,
+    (res) => {
         console.log('Fetched notifications:', res)
         setNotifications(res)
+      },
+    (error) => {
+        console.error('Error fetching notifications:', error)
+        toast.error('Error fetching notifications')
       })
+      return () => {
+        eventSource.close()
+      }
+
   }
 
   useEffect(() => {
