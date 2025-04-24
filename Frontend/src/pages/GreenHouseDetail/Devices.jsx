@@ -155,7 +155,7 @@ const Devices = () => {
                             max={100}
                             onChange={(_, newValue) => handleCheckboxChange(device.CID, newValue)}
                             onChangeCommitted={() => {
-                              sliderRef.current?.blur(); // Bỏ focus
+                              sliderRef.current?.blur();
                             }}
                           />
                         </TableCell>
