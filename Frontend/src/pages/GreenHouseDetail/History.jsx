@@ -14,7 +14,7 @@ import { useParams } from 'react-router-dom'
 
 const History = () => {
   const [sensorDatas, setSensorDatas] = useState([])
-  const [deviceId, setdeviceId] = useState(1)
+  const [deviceId, setdeviceId] = useState()
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState()
   const [searchDate, setSearchDate] = useState('')
@@ -107,17 +107,27 @@ const History = () => {
                 <Typography variant="subtitle2">Date</Typography>
               </TableCell>
               <TableCell>
-                <Typography variant="subtitle2">Data</Typography>
+                <Typography variant="subtitle2">Time</Typography>
+              </TableCell>
+              <TableCell>
+                <Typography variant="subtitle2">Value</Typography>
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {sensorDatas.map((sensorData) => (
-              <TableRow key={sensorData.CID}>
-                <TableCell>{sensorData.dateCreated}</TableCell>
+            {sensorDatas.map((sensorData) => {
+              const date = new Date(sensorData.dateCreated);
+              const formattedDate = date.toISOString().split('T')[0]; // yyyy-mm-dd
+              const formattedTime = date.toTimeString().split(' ')[0]; // hh:mm:ss
+            
+              return (
+                <TableRow key={sensorData.CID}>
+                <TableCell>{formattedDate}</TableCell>
+                <TableCell>{formattedTime}</TableCell>
                 <TableCell>{sensorData.value}</TableCell>
-              </TableRow>
-            ))}
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>

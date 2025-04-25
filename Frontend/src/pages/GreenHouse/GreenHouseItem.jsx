@@ -49,6 +49,7 @@ export const GreenHouseItem = ({ id, name, location, onDelete, onUpdate }) => {
         onClick={() => {
           navigate(`/greenhouse/${id}`)
           localStorage.setItem('name', name)
+          localStorage.setItem('gid', id)
         }}
       >
         <CardContent>
