@@ -109,7 +109,7 @@ export const getSensorRecords = async(deviceId, pageOffset = 1, limit = 10) => {
 
 export const addController = async (controllerDto) => {
     try {
-        const token = localStorage.getItem('token');
+        const token = Cookies.get('token');
         const response = await axios.post(`${BASE_URL}/devices/controllers`, controllerDto,{
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -125,7 +125,7 @@ export const addController = async (controllerDto) => {
 
 export const addSensor = async (sensorDto) => {
     try {
-        const token = localStorage.getItem('token');
+        const token = Cookies.get('token');
         const response = await axios.post(`${BASE_URL}/devices/sensors`, sensorDto,{
             headers: {
                 Authorization: `Bearer ${token}`,
