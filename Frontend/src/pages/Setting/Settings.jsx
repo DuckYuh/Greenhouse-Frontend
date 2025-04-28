@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, Divider, Breadcrumbs, Button, TextField, Stack, Alert, IconButton } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import Sidebar from '../../components/SideBar';// Assuming Sidebar is in the same directory
@@ -6,6 +6,32 @@ import CloseIcon from '@mui/icons-material/Close';
 
 const Settings = () => {
     const [successMessage, setSuccessMessage] = useState(false);
+    
+    const [formData, setFormData] = useState({
+        username: '',
+        email: '',
+        phoneNumber: '',
+        password: '',
+      });
+    
+    useEffect(() => {
+        const fetchUserData = async () => {
+          try {
+            const response = await axios.get('/api/user/profile');//Cần tìm đúng api
+            const data = response.data;
+            setFormData({
+              username: data.username,  
+              email: data.email,
+              phoneNumber: data.phoneNumber,
+              password: '', // Password thường không trả về
+            });
+          } catch (error) {
+            console.error('Failed to fetch user data:', error);
+          }
+        };
+    
+        fetchUserData();
+      }, []);
 
     const handleSave = () => {
         setSuccessMessage(true);
@@ -59,10 +85,35 @@ const Settings = () => {
             {/* User Details Section */}
             <Typography variant="h6" sx={{ mb: 2 }}>User Details</Typography>
             <Stack spacing={2} sx={{ mb: 3 }}>
-            <TextField fullWidth label="Username" variant="outlined" placeholder="Username" />
-            <TextField fullWidth label="Email" variant="outlined" placeholder="Email" />
-            <TextField fullWidth label="Phone Number" variant="outlined" placeholder="Phone Number" />
-            <TextField fullWidth label="Password" variant="outlined" type="password" placeholder="Password" />
+            <TextField 
+            fullWidth label="Username" 
+            variant="outlined" 
+            placeholder="Username" 
+            value={formData.username}
+            onChange={(e) => setFormData({...formData, username: e.target.value})} 
+            />
+            <TextField 
+            fullWidth label="Email" 
+            variant="outlined" 
+            placeholder="Email" 
+            value={formData.email}
+            onChange={(e) => setFormData({...formData, email: e.target.value})}
+            />
+            <TextField 
+            fullWidth label="Phone Number" 
+            variant="outlined" 
+            placeholder="Phone Number" 
+            value={formData.phoneNumber}
+            onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
+            />
+            <TextField 
+            fullWidth label="Password" 
+            variant="outlined" 
+            type="password" 
+            placeholder="Password" 
+            value={formData.password}
+            onChange={(e) => setFormData({...formData, password: e.target.value})}
+            />
             </Stack>
 
             {/* Save Button */}
