@@ -3,6 +3,7 @@ import { Box, Typography, Divider, Breadcrumbs, Button, TextField, Stack, Alert,
 import CssBaseline from '@mui/material/CssBaseline';
 import Sidebar from '../../components/SideBar';// Assuming Sidebar is in the same directory
 import CloseIcon from '@mui/icons-material/Close';
+import { fetchUserProfile } from '../../apis/user';
 
 const Settings = () => {
     const [successMessage, setSuccessMessage] = useState(false);
@@ -17,14 +18,21 @@ const Settings = () => {
     useEffect(() => {
         const fetchUserData = async () => {
           try {
-            const response = await axios.get('/api/user/profile');//Cần tìm đúng api
-            const data = response.data;
-            setFormData({
-              username: data.username,  
-              email: data.email,
-              phoneNumber: data.phoneNumber,
-              password: '', // Password thường không trả về
-            });
+            const userData = await fetchUserProfile();
+            if (userData.username == null){
+                console.log('User name is null or undefined');
+            }
+            else{
+                console.log('User Name:', userData.username);
+            }
+            if (userData) {
+              setFormData({
+                username: userData.username || '',
+                email: userData.email || '',
+                phoneNumber: userData.phoneNumber || '',
+                password: userData.password || '', // Password thường không trả về
+              });
+            }
           } catch (error) {
             console.error('Failed to fetch user data:', error);
           }
