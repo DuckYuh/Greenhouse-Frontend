@@ -111,7 +111,7 @@ const Devices = () => {
         try {
           const gid = localStorage.getItem('gid')
           const response = await fetchDevices(page,gid)
-          setDevices(response.data);
+          setFilteredDevices(response.data);
           setFilteredDevices(response.data); // Ban đầu hiện tất cả
           setTotalPages(response.totalPages);
           console.log('Devices:', devices)
@@ -129,7 +129,7 @@ const Devices = () => {
       } catch (error) {
         console.error('Không thể cập nhật thiết bị:', error)
         // Rollback về trạng thái ngược lại nếu API thất bại
-        setDevices((prevDevices) =>
+        setFilteredDevices((prevDevices) =>
           prevDevices.map((device) =>
             device.CID === cid ? { ...device, status: status === 1 ? 0 : 1 } : device
           )
@@ -145,7 +145,7 @@ const Devices = () => {
       console.log(`Trước: CID=${cid}, status=${currentStatus}, sẽ thành ${newStatus}`)
   
       // Cập nhật trạng thái ngay lập tức
-      setDevices((prevDevices) =>
+      setFilteredDevices((prevDevices) =>
         prevDevices.map((device) =>
           device.CID === cid ? { ...device, status: newStatus, value: newValue } : device
         )
