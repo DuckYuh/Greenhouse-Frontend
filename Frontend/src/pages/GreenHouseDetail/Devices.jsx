@@ -234,14 +234,24 @@ const Devices = () => {
                       <TableRow key={device.CID}>
                         <TableCell>
                           <Slider
-                            ref={sliderRef}
                             value={device.value}
                             step={1}
                             min={0}
                             max={100}
-                            onChange={(_, newValue) => handleCheckboxChange(device.CID, newValue)}
-                            onChangeCommitted={() => {
-                              sliderRef.current?.blur();
+                            onChange={(_, newValue) => {
+                              // Cập nhật UI tạm thời khi kéo slider
+                              setFilteredDevices((prevDevices) =>
+                                prevDevices.map((d) =>
+                                  d.CID === device.CID ? { ...d, value: newValue } : d
+                                )
+                              );
+                            }}
+                            onChangeCommitted={(_, newValue) => {
+                              // Khi thả chuột mới gửi API
+                              const token = Cookies.get('token');
+                              const decodedToken = jwtDecode(token);
+                              const userId = decodedToken.sub;
+                              sendDataToDeviceAsync(device.CID, 1, newValue, userId);
                             }}
                           />
                         </TableCell>

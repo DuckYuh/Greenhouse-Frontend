@@ -7,13 +7,15 @@ import Temperature from '../Data/Temperature'
 import Earth from '../Data/Earth'
 import { useEffect, useState } from 'react'
 import { subscribeGreenhouseData } from '../../apis/deviceApi'
-
+import { useParams } from 'react-router-dom'
 const Data = () => {
   const [humidityValue, setHumidityValue] = useState(null)
   const [lightValue, setLightValue] = useState(null)
   const [temperatureValue, setTemperatureValue] = useState(null)
   const [earthValue, setEarthValue] = useState(null)
   const [error, setError] = useState(null)
+  const {GreenHouseId} = useParams()
+  const greenhouseId = GreenHouseId
 
   const handleSensorData = (sensorData) => {
     sensorData.forEach(({ sensorType, value }) => {
@@ -36,8 +38,27 @@ const Data = () => {
     })
   }
 
+const handleSensorData_ele = (sensorData) => {
+  console.log('Received data:', sensorData[0].sensorType)
+  switch (sensorData[0].sensorType) {
+    case 'humidity':
+      setHumidityValue(sensorData[0].value)
+      break
+    case 'light':
+      setLightValue(sensorData[0].value)
+      break
+    case 'temperature':
+      setTemperatureValue(sensorData[0].value)
+      break
+    case 'earth':
+      setEarthValue(sensorData[0].value)
+      break
+    default:
+      console.warn('Loại cảm biến không xác định:', sensorData[0])
+    }
+}
+
   useEffect(() => {
-    const greenhouseId = localStorage.getItem('gid');
     const eventSource = subscribeGreenhouseData(
       greenhouseId,
       (newData) => {
@@ -45,6 +66,9 @@ const Data = () => {
         
         if (Array.isArray(newData)) {
           handleSensorData(newData)
+        }
+        else {
+          handleSensorData_ele(newData)
         }
       },
       (err) => setError('Không thể kết nối SSE')
