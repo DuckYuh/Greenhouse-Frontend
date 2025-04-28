@@ -33,6 +33,7 @@ export const subscribeGreenhouseData = (greenhouseId, onMessage, onError) => {
 export const fetchDevices = async (pageNum, greenhouseId = 1) => {
     try {
         const token = Cookies.get('token')
+        console.log(token)
         const response = await axios.get(`${BASE_URL}/devices/controllers`, {
             headers: {
                 Authorization: `Bearer ${token}`

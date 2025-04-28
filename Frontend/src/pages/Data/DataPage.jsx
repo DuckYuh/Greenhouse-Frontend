@@ -38,7 +38,7 @@ const DataPage = () => {
     }
 
     useEffect(() => {
-        const greenhouseId = 1
+        const greenhouseId = localStorage.getItem('gid');
         const eventSource = subscribeGreenhouseData(
             greenhouseId,
             (newData) => {

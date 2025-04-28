@@ -124,7 +124,7 @@ const Schedule = () => {
           <TableHead>
             <TableRow>
               <TableCell>Thời gian bắt đầu</TableCell>
-              <TableCell>Thời lượng (phút)</TableCell>
+              <TableCell>Thời lượng (giây)</TableCell>
               <TableCell>Giá trị</TableCell>
               <TableCell>Lặp lại</TableCell>
               <TableCell>Hành động</TableCell>

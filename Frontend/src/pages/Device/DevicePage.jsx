@@ -78,7 +78,7 @@ const DeviceTable = () => {
       const commonData = {
         topic: formData.topic,
         deviceType: formData.deviceType,
-        greenHouseId: 1, // Tùy theo logic app bạn
+        greenHouseId: localStorage.getItem('gid'), // Tùy theo logic app bạn
         userId: userId,
       };
   
