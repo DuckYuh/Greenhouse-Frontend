@@ -111,7 +111,7 @@ const Devices = () => {
         try {
           const gid = localStorage.getItem('gid')
           const response = await fetchDevices(page,gid)
-          setFilteredDevices(response.data);
+          setDevices(response.data);
           setFilteredDevices(response.data); // Ban đầu hiện tất cả
           setTotalPages(response.totalPages);
           console.log('Devices:', devices)
