@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Box,
   Button,
@@ -6,77 +6,70 @@ import {
   Container,
   Divider,
   FormControlLabel,
-  Grid,
-  Paper,
-  IconButton, 
+  IconButton,
   InputAdornment,
+  Paper,
   TextField,
   Typography
 } from '@mui/material'
-import GoogleIcon from '@mui/icons-material/Google'
-import FacebookIcon from '@mui/icons-material/Facebook'
-import { Link } from 'react-router-dom'
-import { signup } from '../../apis/auth';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { useState } from 'react';
-
-
+import { Link, useNavigate } from 'react-router-dom'
+import { signup } from '../../apis/auth'
+import Cookies from 'js-cookie'
+import { toast } from 'react-toastify'
 
 const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false)
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
+
   const handleSubmit = async (event) => {
-    event.preventDefault();
-    setError('');
-    setLoading(true);
+    event.preventDefault()
+    setError('')
+    setLoading(true)
+
     if (!username.trim() || !email.trim() || !password.trim()) {
-      setError('Username and email and password are required!');
-      setLoading(false);
-      return;
+      setError('Username, email, and password are required!')
+      setLoading(false)
+      return
     }
-    try {
-      const data = await signup(username, email, password);
-      localStorage.setItem('token', data.access_token);
-      navigate('/');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+
+    await toast.promise(signup(username, email, password), {
+      pending: 'Signing up...'
+    }).then((res) => {
+      Cookies.set('token', res.access_token, { expires: 7, sameSite: 'Lax' })
+      Cookies.set('refreshToken', res.refresh_token, { expires: 7, sameSite: 'Lax' })
+      navigate('/')
+    }).catch((err) => {
+      setError(err.message)
+    }).finally(() => {
+      setLoading(false)
+    })
   }
-  const [open, setOpen] = useState(false);
-  const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setOpen(false);
-  };
+
   return (
     <Container component="main" maxWidth="sm" sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <Paper
-        stroke="black"
         sx={{
           p: 5,
           borderRadius: 12,
           width: '100%',
           backdropFilter: 'blur(5px)',
           backgroundColor: 'rgba(255, 255, 255, 0.3)'
-        }}>
+        }}
+      >
         <Typography variant="h4" component="h1" gutterBottom textAlign="center">
-                Sign Up Free
+          Sign Up Free
         </Typography>
 
         <Box component="form" noValidate sx={{ mt: 2 }} onSubmit={handleSubmit}>
+          {error && <Typography color="error" textAlign={'center'}>{error}</Typography>}
 
-          {/* Username */}
           <TextField
             fullWidth
             label="Username"
@@ -88,7 +81,6 @@ const RegisterForm = () => {
             error={!!error && !username.trim()}
           />
 
-          {/* Email */}
           <TextField
             fullWidth
             label="Email"
@@ -100,7 +92,6 @@ const RegisterForm = () => {
             error={!!error && !email.trim()}
           />
 
-          {/* Password */}
           <TextField
             fullWidth
             label="Password"
@@ -123,43 +114,21 @@ const RegisterForm = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          {/* Confirm Password */}
-          <TextField 
-            fullWidth label="Confirm Password" 
-            type={showPassword ? 'text' : 'password'} 
-            variant="outlined" 
-            margin="normal" 
-            placeholder="Confirm your password"
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }
-            }}
-          />
+          {/* Optional confirm password logic could be added here */}
 
-          {/* Terms & Conditions */}
           <FormControlLabel control={<Checkbox color="success" />} label="I agree to the Terms and Conditions" sx={{ display: 'flex', justifyContent: 'center', width: '100%' }} />
 
-          {/* Register Button */}
           <Button type="submit" fullWidth variant="contained" color="success" sx={{ mt: 2, py: 1.5 }}>
-                    Register
+            {loading ? 'Registering...' : 'Register'}
           </Button>
         </Box>
 
-        {/* Divider */}
         <Divider sx={{ my: 3 }} color='black'></Divider>
 
-        {/* Login Link */}
         <Typography variant="body2" align="center" sx={{ mt: 3 }}>
-                Already have an account?{' '}
+          Already have an account?{' '}
           <Typography
-            component={Link} // Bọc Link trong Typography
+            component={Link}
             to="/Login"
             color="primary"
             sx={{ fontWeight: 'bold', textDecoration: 'none', cursor: 'pointer' }}
