@@ -4,6 +4,7 @@ import {
 } from '@mui/material'
 import { Edit, Delete } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
+import { sub2greenhouse } from '../../apis/user'
 
 const modalStyle = {
   position: 'absolute',
@@ -48,6 +49,7 @@ export const GreenHouseItem = ({ id, name, location, onDelete, onUpdate }) => {
         }}
         onClick={() => {
           navigate(`/greenhouse/${id}`)
+          sub2greenhouse([id],true)
           localStorage.setItem('name', name)
           localStorage.setItem('gid', id)
         }}
