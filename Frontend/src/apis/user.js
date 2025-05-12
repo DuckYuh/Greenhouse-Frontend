@@ -17,13 +17,15 @@ export const fetchUserProfile = async () => {
     }
 }
 
-export const sub2greenhouse = async (greenhouseID) => { 
+export const sub2greenhouse = async (greenhouseIDs, subscribe) => { 
   try {
     const token = Cookies.get('token');
     const decodedToken = jwtDecode(token);
+    const userId = decodedToken.sub;
+
     const response = await axios.post(
-      `${BASE_URL}/user/${decodedToken.sub}/true`, // Truyền userId và option=true vào URL
-      { greenhouseID },                  // Body
+      `${BASE_URL}/user/${userId}/${subscribe}`, // true = subscribe, false = unsubscribe
+      { greenhouseID: greenhouseIDs },           // Body expects { greenhouseID: [1, 2, 3] }
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -31,8 +33,10 @@ export const sub2greenhouse = async (greenhouseID) => {
         },
       }
     );
+
     return response.data;
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Subscription error:', error);
+    throw error;
   }
 };
