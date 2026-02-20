@@ -1,98 +1,242 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  <h1 align="center">🌿 Greenhouse Monitoring & Control System</h1>
+  <p align="center">
+    A full-stack IoT web application for real-time greenhouse monitoring, remote device control, and automated scheduling — powered by Adafruit IO MQTT.
+  </p>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+---
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📋 Table of Contents
 
-## Description
+- [Overview](#overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
+- [API Reference](#api-reference)
+- [Architecture](#architecture)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## Overview
 
-```bash
-$ npm install
+The Greenhouse Monitoring & Control System enables users to manage multiple greenhouses, monitor environmental sensor data (temperature, humidity, light, soil moisture) in real time, remotely control actuator devices, set up automated schedules, and receive threshold-based alerts — all from a responsive web dashboard.
+
+---
+
+## Features
+
+| Feature | Description |
+|---|---|
+| **Authentication** | JWT-based sign up, sign in, and session management with protected routes |
+| **Multi-Greenhouse Management** | Create, update, delete, and browse greenhouses with pagination |
+| **Real-Time Monitoring** | Live sensor dashboard via Server-Sent Events (SSE) with charts |
+| **Device Control** | Toggle controllers on/off, adjust slider values, send commands to IoT devices |
+| **Threshold Alerts** | Automatic notifications when sensor readings exceed configured limits |
+| **Scheduling** | Create recurring or one-time schedules for automated device operations |
+| **Sensor History** | Paginated historical records filterable by date for each sensor type |
+| **User Settings** | Manage profile, email, phone number, and password |
+
+---
+
+## Tech Stack
+
+### Frontend
+
+| Technology | Purpose |
+|---|---|
+| React 19 | UI framework |
+| Vite 6 | Build tool & dev server |
+| Material UI (MUI) v6 | Component library & icons |
+| React Router v7 | Client-side routing |
+| Redux Toolkit | State management |
+| Recharts | Data visualization & charts |
+| Axios | HTTP client |
+| EventSource Polyfill | SSE with auth headers |
+
+### Backend
+
+| Technology | Purpose |
+|---|---|
+| NestJS v11 | Server framework (TypeScript) |
+| Prisma v6 | ORM & database client |
+| MySQL | Relational database |
+| MQTT (mqtt.js) | IoT messaging via Adafruit IO |
+| JWT | Authentication tokens |
+| Argon2 | Password hashing |
+| RxJS | Reactive streams for SSE |
+
+---
+
+## Project Structure
+
+```
+├── Frontend/                # React (Vite) application
+│   ├── src/
+│   │   ├── apis/            # API service modules
+│   │   ├── assets/          # Static assets
+│   │   ├── components/      # Shared components (Header, SideBar)
+│   │   ├── pages/           # Page components
+│   │   │   ├── Auth/        # Login, Register, Verify
+│   │   │   ├── Data/        # Sensor data dashboards
+│   │   │   ├── Device/      # Device management
+│   │   │   ├── GreenHouse/  # Greenhouse listing
+│   │   │   ├── GreenHouseDetail/  # Greenhouse detail views
+│   │   │   ├── History/     # Sensor history
+│   │   │   ├── HomePage/    # Dashboard home
+│   │   │   ├── Schedule/    # Schedule management
+│   │   │   └── Setting/     # User settings
+│   │   ├── redux/           # Redux store & slices
+│   │   └── util/            # Utilities & constants
+│   └── package.json
+│
+├── Backend/                 # NestJS application
+│   ├── src/
+│   │   ├── auth/            # Authentication module
+│   │   ├── devices/         # Device management module
+│   │   ├── mqtt/            # MQTT integration module
+│   │   ├── prisma/          # Prisma database module
+│   │   ├── sse/             # Server-Sent Events module
+│   │   └── user/            # User management module
+│   ├── prisma/              # Prisma schema & migrations
+│   ├── test/                # E2E tests
+│   └── package.json
+│
+└── README.md
 ```
 
-## Compile and run the project
+---
+
+## Getting Started
+
+### Prerequisites
+
+- **Node.js** >= 18
+- **MySQL** database
+- **Adafruit IO** account (for MQTT broker)
+
+### Frontend
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+cd Frontend
+npm install
+npm run dev
 ```
 
-## Run tests
+The frontend dev server will start at `http://localhost:5173`.
+
+### Backend
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+cd Backend
+npm install
+npx prisma generate
+npx prisma migrate dev
+npm run start:dev
 ```
 
-## Deployment
+The backend server will start at `http://localhost:8080`.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+---
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Environment Variables
 
-```bash
-$ npm install -g mau
-$ mau deploy
+### Backend (`Backend/.env`)
+
+```env
+DATABASE_URL="mysql://user:password@localhost:3306/greenhouse"
+PORT=8080
+JWT_SECRET=your_jwt_secret
+
+MQTT_PORT=8883
+MQTT_USERNAME=your_adafruit_username
+MQTT_PASSWORD=your_adafruit_api_key
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Frontend
 
-## Resources
+Update the API base URL in `Frontend/src/util/constant.js` to match your backend address.
 
-Check out a few resources that may come in handy when working with NestJS:
+---
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## API Reference
 
-## Support
+### Auth — `/auth`
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/auth/signin` | Sign in (returns JWT) |
+| `POST` | `/auth/signup` | Register new user |
+| `GET` | `/auth/profile` | Get current user profile |
 
-## Stay in touch
+### Greenhouse — `/greenhouse`
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/greenhouse/details` | List greenhouses (paginated) |
+| `GET` | `/greenhouse/names` | List greenhouse names |
+| `POST` | `/greenhouse` | Create greenhouse |
+| `PATCH` | `/greenhouse/:id` | Update greenhouse |
+| `DELETE` | `/greenhouse/:id` | Delete greenhouse |
+
+### Devices — `/devices`
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/devices/controllers` | List controllers (paginated) |
+| `GET` | `/devices/sensors` | List sensors (paginated) |
+| `POST` | `/devices/controllers` | Add a controller |
+| `POST` | `/devices/sensors` | Add a sensor |
+| `POST` | `/devices/sendData` | Publish command via MQTT |
+| `GET` | `/devices/sensor-records/:id` | Get sensor history |
+
+### Scheduler — `/scheduler`
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/scheduler/:greenhouseId` | List schedules |
+| `POST` | `/scheduler` | Create schedule |
+| `PATCH` | `/scheduler/:id` | Update schedule |
+| `DELETE` | `/scheduler/:id` | Delete schedule |
+
+### SSE — `/sse`
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/sse` | Stream threshold alerts |
+| `GET` | `/sse/data` | Stream live sensor data |
+| `GET` | `/sse/notification` | Stream unread notifications |
+
+---
+
+## Architecture
+
+```
+┌─────────────┐     HTTP/SSE     ┌──────────────┐     MQTT      ┌──────────────┐
+│   Frontend   │ ◄─────────────► │   Backend    │ ◄───────────► │ Adafruit IO  │
+│   (React)    │                 │  (NestJS)    │               │  (MQTT Broker)│
+└─────────────┘                  └──────┬───────┘               └──────┬───────┘
+                                        │                              │
+                                        │ Prisma ORM                   │ MQTT
+                                        ▼                              ▼
+                                 ┌──────────────┐              ┌──────────────┐
+                                 │    MySQL     │              │  IoT Devices │
+                                 │   Database   │              │  (Sensors &  │
+                                 └──────────────┘              │ Controllers) │
+                                                               └──────────────┘
+```
+
+**Data Flow:**
+1. IoT sensors publish readings to Adafruit IO via MQTT
+2. Backend subscribes to device topics, stores records in MySQL
+3. If a reading exceeds the configured threshold, an alert is emitted
+4. Frontend receives real-time updates via SSE streams
+5. Users can send control commands from the dashboard → Backend → MQTT → Device
+
+---
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This project is private and unlicensed.
