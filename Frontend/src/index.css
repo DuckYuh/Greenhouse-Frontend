@@ -1,0 +1,9 @@
+body {
+  margin: 0;  /* Xóa margin mặc định */
+  padding: 0; /* Xóa padding nếu cần */
+  background-color: #f5f5f5; /* Ví dụ: chỉnh màu nền */
+}
+:root {
+  font-family: "Inter", serif;
+
+}
